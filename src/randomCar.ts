@@ -1,9 +1,6 @@
-import { smallCar } from "./interfaces";
+import { SmallCar } from './interfaces';
 
 export class RandomCar {
-  constructor () {
-
-  }
 
   randomName() {
     const cars: string[] = [
@@ -106,23 +103,23 @@ export class RandomCar {
       'Renault Zoe',
       'Toyota Prius',
       'Toyota RAV4',
-      'Lada'
-    ]
+      'Lada',
+    ];
     const random = Math.floor(Math.random() * 101);
     return cars[random];
   }
 
   randomColor() {
-    return Math.floor(Math.random()*16777215).toString(16);
+    return Math.floor(Math.random() * 16777215).toString(16);
   }
 
   randomCars() {
-    const cars: smallCar[] = []
+    const cars: SmallCar[] = [];
     for (let i = 0; i < 100; i++) {
-      const newCar: smallCar = {
+      const newCar: SmallCar = {
         name: this.randomName(),
-        color: `#${this.randomColor()}`
-      }
+        color: `#${this.randomColor()}`,
+      };
       cars.push(newCar);
     }
     return cars;

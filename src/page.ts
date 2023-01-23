@@ -1,22 +1,29 @@
-import { Element } from "./element";
-import { GetData } from "./getdata";
-import { car, smallCar, timeSpeed } from "./interfaces";
-import { RandomCar } from "./randomCar";
+import { Element } from './element';
+import { GetData } from './getdata';
+import { Car, SmallCar } from './interfaces';
+import { RandomCar } from './randomCar';
 
 export class Page {
   private main = document.getElementsByTagName('main')[0];
+
   private cars = new GetData();
+
   private el = new Element();
+
   private numberWins: number[] = [];
-  private currentCar: car[] = [];
+
+  private currentCar: Car[] = [];
+
   private randomCar = new RandomCar();
-  private winnerID: number = 0;
+
+  private winnerID = 0;
+
   constructor() {
-    const cars = this.cars.getCars();
+    const carsList = this.cars.getCars();
     for (let i = 0; i < 7; i++) {
-      cars.then((cars: car[]) => {
+      carsList.then((cars: Car[]) => {
         cars.forEach((item) => {
-          if (item.id === i+1) {
+          if (item.id === i + 1) {
             this.currentCar.push(item);
           }
         });
@@ -52,13 +59,29 @@ export class Page {
     const setting = this.el.createElement({ tag: 'div', id: 'setting' });
     const buttonMenu1 = this.el.createElement({ tag: 'div', classNote: 'button__menu' });
     const inputCreate = this.el.createInput({ type: 'text', id: 'input__create' });
-    const inputCreateColor = this.el.createInput({ type: 'color', id: 'input__create__color', name: 'color', value: '#ffffff' });
+    const inputCreateColor = this.el.createInput({
+      type: 'color',
+      id: 'input__create__color',
+      name: 'color',
+      value: '#ffffff',
+    });
     const buttonCreate = this.el.createElement({ tag: 'button', id: 'button__create', content: 'CREATE' });
     buttonMenu1.append(inputCreate, inputCreateColor, buttonCreate);
     const buttonMenu2 = this.el.createElement({ tag: 'div', classNote: 'button__menu' });
     const inputUpdate = this.el.createInput({ type: 'text', id: 'input__update', disable: true });
-    const inputUpdateColor = this.el.createInput({ type: 'color', id: 'input__update__color', name: 'color', value: '#ffffff', disable: true });
-    const buttonUpdate = this.el.createElement({ tag: 'button', id: 'button__update', content: 'UPDATE', disable: true });
+    const inputUpdateColor = this.el.createInput({
+      type: 'color',
+      id: 'input__update__color',
+      name: 'color',
+      value: '#ffffff',
+      disable: true,
+    });
+    const buttonUpdate = this.el.createElement({
+      tag: 'button',
+      id: 'button__update',
+      content: 'UPDATE',
+      disable: true,
+    });
     buttonMenu2.append(inputUpdate, inputUpdateColor, buttonUpdate);
     const buttonMenu3 = this.el.createElement({ tag: 'div', classNote: 'button__menu' });
     const buttonRace = this.el.createElement({ tag: 'button', id: 'race', content: 'RACE' });
@@ -71,25 +94,23 @@ export class Page {
     buttonCreate.addEventListener('click', () => {
       if (inputCreate) {
         if (inputCreate.value.trim() != '') {
-          const newCar:smallCar = {
+          const newCar: SmallCar = {
             name: inputCreate.value,
-            color: inputCreateColor.value
-          }
-          console.log(newCar);
+            color: inputCreateColor.value,
+          };
           this.cars.createCar(newCar);
           document.location.reload();
         }
       }
-     });
+    });
 
     buttonUpdate.addEventListener('click', () => {
       if (inputUpdate) {
         if (inputUpdate.value.trim() != '') {
-          const newCar:smallCar = {
+          const newCar: SmallCar = {
             name: inputUpdate.value,
-            color: inputUpdateColor.value
-          }
-          console.log(newCar);
+            color: inputUpdateColor.value,
+          };
           this.cars.updateCar(Number(inputUpdate.textContent), newCar);
           document.location.reload();
         }
@@ -118,14 +139,6 @@ export class Page {
           (bt as HTMLButtonElement).disabled = true;
         }
       });
-      let controller: AbortController;
-      // await new GetData().drive(item.id, controller.signal).then((items) => {
-      //   console.log(items);
-      //   cancelAnimationFrame(request);
-      //   if (items.success) {
-      //     console.log(item.id);
-      //   }
-      // }).catch((err) => {console.log(err)});
     });
 
     buttonReset.addEventListener('click', async () => {
@@ -156,23 +169,22 @@ export class Page {
   }
 
   createCarsList() {
-    
-    const cars = this.cars.getCars();
-    cars.then((cars) => {
+    const carsList = this.cars.getCars();
+    carsList.then((cars) => {
       this.createCarFromData(cars);
-    })
+    });
     //this.createCarFromData(cars);
   }
-  
-  createCarFromData(car: car[]) {
-    let maxPage = Math.ceil(car.length/7);
+
+  createCarFromData(car: Car[]) {
+    const maxPage = Math.ceil(car.length / 7);
     let page = 1;
     const main = document.getElementsByTagName('main')[0];
     const h2 = this.el.createElement({ tag: 'h2', id: 'garage__text', content: `Garage (${car.length})` });
     const p = this.el.createElement({ tag: 'p', id: 'page', content: `Page #${page}` });
     const div = this.el.createElement({ tag: 'div', id: 'card__list' });
     main.append(h2, p, div);
-    
+
     let counter = 0;
     car.forEach((item, index) => {
       const carCard = this.el.createElement({ tag: 'div', id: 'car__card' });
@@ -182,8 +194,19 @@ export class Page {
       const span = this.el.createElement({ tag: 'span', content: `${item.name}` });
       const track = this.el.createElement({ tag: 'div', classNote: 'track' });
       const buttonDiv = this.el.createElement({ tag: 'div', id: 'start__stop' });
-      const btA = this.el.createElement({ tag: 'button', classNote: 'button__start', id: `button__start__${index}`, content: 'A' });
-      const btB = this.el.createElement({ tag: 'button', classNote: 'button__stop', id: `button__stop__${index}`, content: 'B', disable: true });
+      const btA = this.el.createElement({
+        tag: 'button',
+        classNote: 'button__start',
+        id: `button__start__${index}`,
+        content: 'A',
+      });
+      const btB = this.el.createElement({
+        tag: 'button',
+        classNote: 'button__stop',
+        id: `button__stop__${index}`,
+        content: 'B',
+        disable: true,
+      });
       buttonDiv.append(btA, btB);
       const svg = this.el.createCarSVG();
       svg.id = `svg__${item.id}`;
@@ -210,7 +233,6 @@ export class Page {
         if (button) {
           button.disabled = false;
         }
-        console.log('click')
       });
       btRemove.addEventListener('click', () => {
         this.cars.deleteCar(item.id);
@@ -219,73 +241,60 @@ export class Page {
 
       let request = 0;
       let width = 0;
-      let left = 120;
       let time = 0;
-      let startAnimation: number = 0;
+      let startAnimation = 0;
       function drive(times: number) {
         if (startAnimation === 0) {
           startAnimation = times;
         }
         const progress = (times - startAnimation) / time;
-        //console.log(left)
-        left += 1;
-        svg.style.marginLeft = `${120 + (progress * width)}px`;
+        svg.style.marginLeft = `${120 + progress * width}px`;
         if (progress < 1) {
           request = requestAnimationFrame(drive);
         }
       }
 
       let controller: AbortController;
-      let curr = 0;
       btA.addEventListener('click', async () => {
-        
         (btA as HTMLButtonElement).disabled = true;
-        const carCard = document.getElementById('card__list');
+        const cardlist = document.getElementById('card__list');
         width = 0;
-        if (carCard) {
-          width = +carCard.offsetWidth - 230;
+        if (cardlist) {
+          width = +cardlist.offsetWidth - 230;
         }
-        left = 120;
-        let speed = 0;
         time = 0;
         await this.cars.startEngine(item.id).then((items) => {
-          console.log(items);
-          time = Math.abs(items.distance / items.velocity)
-          speed = items.velocity;
+          time = Math.abs(items.distance / items.velocity);
         });
         (btB as HTMLButtonElement).disabled = false;
 
         startAnimation = 0;
         window.requestAnimationFrame(drive);
         controller = new AbortController();
-        await new GetData().drive(item.id, controller.signal).then((items) => {
-          console.log(items);
-          cancelAnimationFrame(request);
-          const race = document.getElementById('race');
-          if (race) {
-            if (items.success && (race as HTMLButtonElement).disabled && this.numberWins.length === 0) {
-              this.winnerID = item.id;
-              console.log(item.id);
-              this.numberWins.push(item.id);
-              console.log(this.numberWins)
-              curr += 1;
-              new GetData().getCar(item.id).then((it) => {
-                console.log(it);
-                alert(`Winner: ${it.name} time: ${time}`);
-              });
-              
-              
+        await new GetData()
+          .drive(item.id, controller.signal)
+          .then((items) => {
+            cancelAnimationFrame(request);
+            const race = document.getElementById('race');
+            if (race) {
+              if (items.success && (race as HTMLButtonElement).disabled && this.numberWins.length === 0) {
+                this.winnerID = item.id;
+                this.numberWins.push(item.id);
+                new GetData().getCar(item.id).then((it) => {
+                  alert(`Winner: ${it.name} time: ${time}`);
+                });
+              }
             }
-          }
-        }).catch((err) => {console.log(err)});
+          })
+          .catch(() => {
+          });
       });
 
       btB.addEventListener('click', async () => {
         (btB as HTMLButtonElement).disabled = true;
-        await this.cars.stopEngine(item.id).then((items) => {
-          console.log(items);
+        await this.cars.stopEngine(item.id).then(() => {
         });
-        svg.style.marginLeft = `120px`;
+        svg.style.marginLeft = '120px';
         (btA as HTMLButtonElement).disabled = false;
         cancelAnimationFrame(request);
         controller.abort();
@@ -297,7 +306,7 @@ export class Page {
       if (cardList) {
         cardList.append(carCard);
       }
-      counter +=1;
+      counter += 1;
     });
     const previousNext = this.el.createElement({ tag: 'div', id: 'previous__next' });
     const previous = this.el.createElement({ tag: 'button', id: 'previous', content: 'previous' });
@@ -306,8 +315,8 @@ export class Page {
     main.append(previousNext);
 
     next.addEventListener('click', () => {
-      const cars = this.cars.getCars();
-      for (let i = (page * 7) - 7; i < 7 * page; i++) {
+      const carsList = this.cars.getCars();
+      for (let i = page * 7 - 7; i < 7 * page; i++) {
         if (page < maxPage) {
           const track = document.getElementById('card__list');
           if (track) {
@@ -318,15 +327,15 @@ export class Page {
       if (page < maxPage) {
         page += 1;
       }
-      for (let i = (page * 7) - 7; i < 7 * page; i++) {
+      for (let i = page * 7 - 7; i < 7 * page; i++) {
         if (i < car.length) {
           const track = document.getElementById('card__list');
           if (track) {
             (track.childNodes[i] as HTMLElement).style.display = 'block';
             this.currentCar = [];
-            cars.then((cars: car[]) => {
+            carsList.then((cars: Car[]) => {
               cars.forEach((item) => {
-                if (item.id === i+1) {
+                if (item.id === i + 1) {
                   this.currentCar.push(item);
                 }
               });
@@ -336,14 +345,13 @@ export class Page {
       }
       const textPage = document.getElementById('page');
       if (textPage) {
-          textPage.textContent = `Page #${page}`;
+        textPage.textContent = `Page #${page}`;
       }
-      console.log(this.currentCar)
     });
 
     previous.addEventListener('click', () => {
-      const cars = this.cars.getCars();
-      for (let i = (page * 7) - 7; i < 7 * page; i++) {
+      const carsList = this.cars.getCars();
+      for (let i = page * 7 - 7; i < 7 * page; i++) {
         if (page > 1) {
           if (i < car.length) {
             const track = document.getElementById('card__list');
@@ -356,15 +364,15 @@ export class Page {
       if (page > 1) {
         page -= 1;
       }
-      for (let i = (page * 7) - 7; i < 7 * page; i++) {
+      for (let i = page * 7 - 7; i < 7 * page; i++) {
         if (i < car.length && page >= 1) {
           const track = document.getElementById('card__list');
           if (track) {
             (track.childNodes[i] as HTMLElement).style.display = 'block';
             this.currentCar = [];
-            cars.then((cars: car[]) => {
+            carsList.then((cars: Car[]) => {
               cars.forEach((item) => {
-                if (item.id === i+1) {
+                if (item.id === i + 1) {
                   this.currentCar.push(item);
                 }
               });
@@ -374,9 +382,8 @@ export class Page {
       }
       const textPage = document.getElementById('page');
       if (textPage) {
-          textPage.textContent = `Page #${page}`;
+        textPage.textContent = `Page #${page}`;
       }
-      console.log(this.currentCar);
     });
     //new AbortController().abort();
   }
