@@ -1,12 +1,9 @@
 {
     "plugins": [
-        "prettier",
         "import",
         "@typescript-eslint"
     ],
     "extends": [
-        "plugin:prettier/recommended",
-        "prettier",
         "plugin:@typescript-eslint/recommended",
         "airbnb-typescript"
     ],
@@ -26,6 +23,7 @@
         "no-console": 1,
         "class-methods-use-this": "off",
         "@typescript-eslint/no-explicit-any": "error",
+        "react/jsx-filename-extension": [0, { "extensions": [".js", ".jsx", ".ts"] }],
         //"@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-inferrable-types": "warn"
     }

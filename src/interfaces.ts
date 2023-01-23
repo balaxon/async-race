@@ -1,15 +1,15 @@
-export interface car {
+export interface Car {
   color: string;
   id: number;
   name: string;
 }
 
-export interface smallCar {
+export interface SmallCar {
   color: string;
   name: string;
 }
 
-export interface element {
+export interface ElementInterface {
   tag: string;
   id?: string;
   classNote?: string;
@@ -17,7 +17,7 @@ export interface element {
   disable?: boolean;
 }
 
-export interface inputElement {
+export interface InputElement {
   type: string;
   id?: string;
   classNote?: string;
@@ -27,7 +27,7 @@ export interface inputElement {
   disable?: boolean;
 }
 
-export interface timeSpeed {
+export interface TimeSpeed {
   time: number;
   speed: number;
 }
