@@ -1,10 +1,32 @@
 import { Element } from './element';
 import { GetData } from './getdata';
-import { Car, SmallCar } from './interfaces';
+import { Car, Engine, GetWinners, SmallCar, UpdateWinner, Winners } from './interfaces';
 import { RandomCar } from './randomCar';
+
+enum TopDown {
+  top = ' ↑',
+  donw = ' ↓',
+  idTop = 'Id ↑',
+  idDown = 'Id ↓',
+  winsTop = 'Wins ↑',
+  winsDown = 'Wins ↓',
+  timeTop = 'Time ↑',
+  timeDown = 'Time ↓',
+}
+
+enum ErrorMessage {
+  page = 'Не на той странице вернули машины в гараж! Перезагрузите страницу!',
+}
 
 export class Page {
   private main = document.getElementsByTagName('main')[0];
+
+  private sort: GetWinners = {
+    page: 1,
+    limit: 10,
+    sort: 'id',
+    order: 'ASC',
+  };
 
   private cars = new GetData();
 
@@ -44,8 +66,174 @@ export class Page {
     const buttonGarage = this.el.createElement({ tag: 'button', id: 'button__garage', content: 'To Garage' });
     const buttonWinners = this.el.createElement({ tag: 'button', id: 'button__winners', content: 'To Winners' });
     nav.append(buttonGarage, buttonWinners);
+    buttonWinners.addEventListener('click', () => {
+      (buttonWinners as HTMLButtonElement).disabled = true;
+      this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winners: Winners[]) => {
+        this.createWinners(winners);
+        const main = document.getElementsByTagName('main')[0];
+        if (main) {
+          main.hidden = true;
+        }
+      });
+      
+    });
     header.append(h1, nav);
     document.body.append(header);
+    buttonGarage.addEventListener('click', () => {
+      (buttonWinners as HTMLButtonElement).disabled = false;
+      const main = document.getElementsByTagName('main')[0];
+      if (main) {
+        main.hidden = false;
+      }
+      const winners = document.getElementById('winners__block');
+      if (winners) {
+        winners.remove();
+      }
+    });
+  }
+
+  createWinners(winners: Winners[]) {
+    const header = document.getElementsByTagName('header')[0];
+    const winnersBlock = this.el.createElement({ tag: 'div', id: 'winners__block' });
+    header.after(winnersBlock);
+    let maxPage = 0;
+    const h2 = this.el.createElement({ tag: 'h2', id: 'winners__text', content: `Winners (${winners.length})` });
+    this.cars.getWinnersCount().then((leng: Winners[]) => {
+      h2.textContent = `Winners (${leng.length})`;
+      maxPage = Math.ceil(leng.length / 10);
+    });
+    const p = this.el.createElement({ tag: 'p', id: 'page', content: `Page #${this.sort.page}` });
+    winnersBlock.append(h2, p);
+    const sortMenu = this.el.createElement({ tag: 'div', id: 'sort__list' });
+    const btId = this.el.createElement({ tag: 'button', id: 'button__id', content: 'Id' });
+    const btName = this.el.createElement({ tag: 'button', id: 'button__name', content: 'Name', disable: true });
+    const btCar = this.el.createElement({ tag: 'button', id: 'button__car', content: 'Car', disable: true });
+    const btWins = this.el.createElement({ tag: 'button', id: 'button__wins', content: 'Wins' });
+    const btTime = this.el.createElement({ tag: 'button', id: 'button__time', content: 'Time' });
+
+    sortMenu.append(btId, btName, btCar, btWins, btTime);
+    switch (this.sort.sort) {
+      case 'id': 
+        btId.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+        break;
+      case 'wins':
+        btWins.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+        break;
+      case 'time':
+        btTime.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+        break;
+      default:
+        break;
+    }
+
+    this.createWinnersList(winners);
+    winnersBlock.append(sortMenu, this.createWinnersList(winners));
+
+    const previousNext = this.el.createElement({ tag: 'div', id: 'winners__previous__next' });
+    const previous = this.el.createElement({ tag: 'button', id: 'winners__previous', content: 'previous' });
+    const next = this.el.createElement({ tag: 'button', id: 'winners__next', content: 'next' });
+    previousNext.append(previous, next);
+    winnersBlock.append(previousNext);
+
+    btId.addEventListener('click', () => {
+      this.sort.sort = 'id';
+      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
+      btId.textContent = this.sort.order === 'ASC' ? TopDown.idTop : TopDown.idDown;
+      btWins.textContent = 'Wins';
+      btWins.textContent = 'Time';
+      this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
+        const winnersList = document.getElementById('winners__list');
+        if (winnersList) {
+          winnersList.remove();
+        }
+        const winBlock = document.getElementById('winners__block');
+        if (winBlock) {
+          previousNext.before(this.createWinnersList(winnersF));
+        }
+      });
+    });
+
+    btWins.addEventListener('click', () => {
+      this.sort.sort = 'wins';
+      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
+      btWins.textContent = this.sort.order === 'ASC' ? TopDown.winsTop : TopDown.winsDown;
+      btId.textContent = 'Id';
+      btTime.textContent = 'Time';
+      this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
+        const winnersList = document.getElementById('winners__list');
+        if (winnersList) {
+          winnersList.remove();
+        }
+        const winBlock = document.getElementById('winners__block');
+        if (winBlock) {
+          previousNext.before(this.createWinnersList(winnersF));
+        }
+      });
+    });
+
+    btTime.addEventListener('click', () => {
+      this.sort.sort = 'time';
+      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
+      btTime.textContent = this.sort.order === 'ASC' ? TopDown.timeTop : TopDown.timeDown;
+      btId.textContent = 'Id';
+      btWins.textContent = 'Wins';
+      this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
+        const winnersList = document.getElementById('winners__list');
+        if (winnersList) {
+          winnersList.remove();
+        }
+        const winBlock = document.getElementById('winners__block');
+        if (winBlock) {
+          previousNext.before(this.createWinnersList(winnersF));
+        }
+      });
+    });
+
+    next.addEventListener('click', () => {
+      if (this.sort.page !== maxPage) {
+        this.sort.page += 1;
+        p.textContent = `Page #${this.sort.page}`;
+        this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
+          const winnersList = document.getElementById('winners__list');
+          if (winnersList) {
+            winnersList.remove();
+          }
+          previousNext.before(this.createWinnersList(winnersF));
+        });
+      }
+    });
+
+    previous.addEventListener('click', () => {
+      if (this.sort.page !== 1) {
+        this.sort.page -= 1;
+        p.textContent = `Page #${this.sort.page}`;
+        this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
+          const winnersList = document.getElementById('winners__list');
+          if (winnersList) {
+            winnersList.remove();
+          }
+          previousNext.before(this.createWinnersList(winnersF));
+        });
+      }
+    });
+  }
+
+  createWinnersList(winners: Winners[]) {
+    const winnersList = this.el.createElement({ tag: 'div', id: 'winners__list' });
+    winners.forEach((winner) => {
+      const winId = this.el.createElement({ tag: 'div', content: `${winner.id}` });
+      const winName = this.el.createElement({ tag: 'div', content: `${winner.id}` });
+      const svg = this.el.createCarSVG();
+      svg.classList.add('svg__wins');
+      const winWins = this.el.createElement({ tag: 'span', content: `${winner.wins}` });
+      const winTime = this.el.createElement({ tag: 'span', content: `${winner.time}` });
+      this.cars.getCar(winner.id).then((car: Car) => {
+        winName.textContent = car.name;
+        svg.setAttribute('fill', `${car.color}`);
+      });
+      winnersList.append(winId, winName, svg, winWins, winTime);
+    });
+    return winnersList;
   }
 
   createMain() {
@@ -170,10 +358,9 @@ export class Page {
 
   createCarsList() {
     const carsList = this.cars.getCars();
-    carsList.then((cars) => {
+    carsList.then((cars:Car[]) => {
       this.createCarFromData(cars);
     });
-    //this.createCarFromData(cars);
   }
 
   createCarFromData(car: Car[]) {
@@ -235,8 +422,16 @@ export class Page {
         }
       });
       btRemove.addEventListener('click', () => {
+        this.cars.getWinner(item.id).then((winner: Winners) => {
+          if (Object.keys(winner).length != 0) {
+            this.cars.deleteWinner(item.id);
+          }
+        });
         this.cars.deleteCar(item.id);
-        document.location.reload();
+        setTimeout(() => {
+          document.location.reload();
+        }, 300);
+        
       });
 
       let request = 0;
@@ -253,8 +448,8 @@ export class Page {
           request = requestAnimationFrame(drive);
         }
       }
-
       let controller: AbortController;
+
       btA.addEventListener('click', async () => {
         (btA as HTMLButtonElement).disabled = true;
         const cardlist = document.getElementById('card__list');
@@ -263,42 +458,52 @@ export class Page {
           width = +cardlist.offsetWidth - 230;
         }
         time = 0;
-        await this.cars.startEngine(item.id).then((items) => {
-          time = Math.abs(items.distance / items.velocity);
-        });
+        await this.cars.startEngine(item.id).then((items: Engine) => time = Math.abs(items.distance / items.velocity));
         (btB as HTMLButtonElement).disabled = false;
-
         startAnimation = 0;
         window.requestAnimationFrame(drive);
         controller = new AbortController();
-        await new GetData()
-          .drive(item.id, controller.signal)
-          .then((items) => {
-            cancelAnimationFrame(request);
-            const race = document.getElementById('race');
-            if (race) {
-              if (items.success && (race as HTMLButtonElement).disabled && this.numberWins.length === 0) {
-                this.winnerID = item.id;
-                this.numberWins.push(item.id);
-                new GetData().getCar(item.id).then((it) => {
-                  alert(`Winner: ${it.name} time: ${time}`);
+        await new GetData().drive(item.id, controller.signal).then((items) => {
+          cancelAnimationFrame(request);
+          const race = document.getElementById('race');
+          if (race) {
+            if (items.success && (race as HTMLButtonElement).disabled && this.numberWins.length === 0) {
+              this.winnerID = item.id;
+              this.numberWins.push(item.id);
+              new GetData().getCar(item.id).then((singlecar) => {
+                this.cars.getWinner(singlecar.id).then((winner: Winners) => {
+                  if (Object.keys(winner).length === 0) {
+                    const newWinner: Winners = { id: singlecar.id, wins: 1, time: +(time / 1000).toFixed(2) };
+                    this.cars.createWinner(newWinner);
+                  } else {
+                    let bestTime = 0;
+                    bestTime = winner.time > +(time / 1000).toFixed(2) ? bestTime = +(time / 1000).toFixed(2) : bestTime = winner.time;
+                    const updateWinner: UpdateWinner = { wins: winner.wins + 1, time: bestTime };
+                    this.cars.updateWinner(singlecar.id, updateWinner);
+                  }
                 });
-              }
+                this.createModal(singlecar.name, +(time / 1000).toFixed(2));
+              });
             }
-          })
+          }
+        })
           .catch(() => {
           });
       });
 
       btB.addEventListener('click', async () => {
-        (btB as HTMLButtonElement).disabled = true;
-        await this.cars.stopEngine(item.id).then(() => {
-        });
-        svg.style.marginLeft = '120px';
-        (btA as HTMLButtonElement).disabled = false;
-        cancelAnimationFrame(request);
-        controller.abort();
+        try {
+          (btB as HTMLButtonElement).disabled = true;
+          await this.cars.stopEngine(item.id).then(() => {});
+          svg.style.marginLeft = '120px';
+          (btA as HTMLButtonElement).disabled = false;
+          cancelAnimationFrame(request);
+          controller.abort();
+        } catch (error) {
+          console.log(ErrorMessage.page);
+        }
       });
+
       const cardList = document.getElementById('card__list');
       if (counter > 6) {
         carCard.style.display = 'none';
@@ -308,6 +513,7 @@ export class Page {
       }
       counter += 1;
     });
+
     const previousNext = this.el.createElement({ tag: 'div', id: 'previous__next' });
     const previous = this.el.createElement({ tag: 'button', id: 'previous', content: 'previous' });
     const next = this.el.createElement({ tag: 'button', id: 'next', content: 'next' });
@@ -385,6 +591,18 @@ export class Page {
         textPage.textContent = `Page #${page}`;
       }
     });
-    //new AbortController().abort();
+  }
+
+  createModal(name: string, time: number) {
+    const modalOverlay = this.el.createElement({ tag: 'div', id: 'modal__overlay' });
+    const modal = this.el.createElement({ tag: 'div', id: 'modal' });
+    const text = this.el.createElement({ tag: 'h2', content: `Winner: ${name} time: ${time}` });
+    const bt = this.el.createElement({ tag: 'button', id: 'modal__bt', content: 'OK' });
+    modal.append(text, bt);
+    modalOverlay.append(modal);
+    document.body.append(modalOverlay);
+    bt.addEventListener('click', () => {
+      modalOverlay.remove();
+    });
   }
 }
