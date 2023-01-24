@@ -9,6 +9,11 @@ export interface SmallCar {
   name: string;
 }
 
+export interface Engine {
+  velocity: number;
+  distance: number;
+}
+
 export interface ElementInterface {
   tag: string;
   id?: string;
@@ -30,4 +35,22 @@ export interface InputElement {
 export interface TimeSpeed {
   time: number;
   speed: number;
+}
+
+export interface GetWinners {
+  page: number;
+  limit?: number;
+  sort?: string;
+  order?: string;
+}
+
+export interface Winners {
+  id: number;
+  wins: number;
+  time: number;
+}
+
+export interface UpdateWinner {
+  wins: number;
+  time: number;
 }

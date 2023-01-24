@@ -20,6 +20,34 @@ main {
   color: white;
 }
 
+#winners__block {
+  background: black;
+  padding-bottom: 70px;
+  color: white;
+  text-align: center;
+}
+
+#winners__text {
+  margin: 0;
+  padding-top: 30px;
+}
+
+#sort__list {
+  display: grid;
+  grid-template-columns: repeat(5, 20%);
+}
+
+#winners__list {
+  display: grid;
+  grid-template-columns: repeat(5, 20%);
+  align-items: flex-end;
+}
+
+.svg__wins {
+  position: relative;
+  margin: 0 auto;
+}
+
 nav {
   display: flex;
   justify-content: space-around;
@@ -67,6 +95,30 @@ svg {
 }
 
 .button__stop:disabled {
+  cursor: default;
+  background: #69001F;
+  transform: none;
+}
+
+#button__winners:disabled {
+  cursor: default;
+  background: #69001F;
+  transform: none;
+}
+
+#button__name:disabled {
+  cursor: default;
+  background: #69001F;
+  transform: none;
+}
+
+#button__car:disabled {
+  cursor: default;
+  background: #69001F;
+  transform: none;
+}
+
+button:disabled {
   cursor: default;
   background: #69001F;
   transform: none;
@@ -181,4 +233,26 @@ footer > div > a > img {
   color: #fff;
   line-height: 2.5rem;
   text-decoration: none;
+}
+
+#modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 200vh;
+  background: rgba(238, 228, 228, 0.82);
+}
+
+#modal {
+  margin: 150px auto 30px;
+  position: relative;
+  width: 460px;
+  background: white;
+  border-radius: 40px;
+  text-align: center;
+}
+
+#winners__previous__next {
+  margin-top: 30px;
 }

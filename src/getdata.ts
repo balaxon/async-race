@@ -1,10 +1,16 @@
-import { SmallCar } from './interfaces';
+import { GetWinners, SmallCar, UpdateWinner, Winners } from './interfaces';
 
 enum Links {
   server = 'http://localhost:3000',
   garage = 'http://localhost:3000/garage',
   engine = 'http://localhost:3000/engine',
   winners = 'http://localhost:3000/winners',
+}
+
+enum Method {
+  post = 'POST',
+  put = 'PUT',
+  get = 'GET',
 }
 
 export class GetData {
@@ -20,7 +26,7 @@ export class GetData {
   async createCar(body: SmallCar) {
     (
       await fetch(`${Links.garage}`, {
-        method: 'POST',
+        method: Method.post,
         body: JSON.stringify(body),
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +42,7 @@ export class GetData {
   async updateCar(id: number, body: SmallCar) {
     (
       await fetch(`${Links.garage}/${id}`, {
-        method: 'PUT',
+        method: Method.put,
         body: JSON.stringify(body),
         headers: {
           'Content-Type': 'application/json',
@@ -63,19 +69,57 @@ export class GetData {
     return res.status !== 200 ? { success: false } : { ...(await res.json()) };
   }
 
-  getSortOrder() {}
+  getSortOrder(sort?: string, order?: string) {
+    let res = '';
+    if (sort && order) {
+      res = `&_sort=${sort}&_order=${order}`;
+    } else {
+      res = '';
+    }
+    return res;
+  }
 
-  getWinners() {}
+  async getWinners({ page, limit = 10, sort, order }: GetWinners) {
+    return (await fetch(`${Links.winners}?_page=${page}&_limit=${limit}${this.getSortOrder(sort, order)}`)).json();
+  }
 
-  getWinner() {}
+  async getWinnersCount() {
+    return (await fetch(`${Links.winners}`)).json();
+  }
+
+  async getWinner(id: number) {
+    return (await fetch(`${Links.winners}/${id}`)).json();
+  }
 
   getWinnerStatus() {}
 
-  deleteWinner() {}
+  async deleteWinner(id: number) {
+    (await fetch(`${Links.winners}/${id}`, { method: 'DELETE' })).json();
+  }
 
-  createWinner() {}
+  async createWinner(body: Winners) {
+    (
+      await fetch(`${Links.winners}`, {
+        method: Method.post,
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    ).json();
+  }
 
-  updateWinner() {}
+  async updateWinner(id: number, body: UpdateWinner) {
+    (
+      await fetch(`${Links.winners}/${id}`, {
+        method: Method.put,
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    ).json();
+  }
 
   saveWinner() {}
 }
