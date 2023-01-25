@@ -1,4 +1,6 @@
 import './style.css';
 import { Page } from './page';
 
-new Page().createDefaultPage();
+const newPage = new Page();
+
+newPage.createDefaultPage();

@@ -24,7 +24,6 @@
         "class-methods-use-this": "off",
         "@typescript-eslint/no-explicit-any": "error",
         "react/jsx-filename-extension": [0, { "extensions": [".js", ".jsx", ".ts"] }],
-        //"@typescript-eslint/no-non-null-assertion": 0,
         "@typescript-eslint/no-inferrable-types": "warn"
     }
 }

@@ -11,18 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EnayaAme/Online-store.git"
+    "url": "git+https://github.com/balaxon/async-race.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/EnayaAme/Online-store/issues"
+    "url": "https://github.com/balaxon/async-race/issues"
   },
-  "homepage": "https://github.com/EnayaAme/Online-store#readme",
+  "homepage": "https://github.com/balaxon/async-race#readme",
   "devDependencies": {
-    "@testing-library/dom": "^8.19.1",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@types/jest": "^29.2.5",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "eslint": "^8.30.0",

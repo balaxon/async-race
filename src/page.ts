@@ -6,12 +6,36 @@ import { RandomCar } from './randomCar';
 enum TopDown {
   top = ' ↑',
   donw = ' ↓',
+  id = 'Id',
   idTop = 'Id ↑',
   idDown = 'Id ↓',
+  wins = 'Wins',
   winsTop = 'Wins ↑',
   winsDown = 'Wins ↓',
+  time = 'Time',
   timeTop = 'Time ↑',
   timeDown = 'Time ↓',
+}
+
+enum SrcImages {
+  logo = './assets/images/logo_rs_text.svg',
+  finish = 'assets/images/finish.png',
+}
+
+enum Sort {
+  id = 'id',
+  wins = 'wins',
+  time = 'time',
+}
+
+enum Order {
+  asc = 'ASC',
+  desc = 'DESC',
+}
+
+enum Arguments {
+  page = 1,
+  limit = 10,
 }
 
 enum ErrorMessage {
@@ -19,13 +43,12 @@ enum ErrorMessage {
 }
 
 export class Page {
-  private main = document.getElementsByTagName('main')[0];
 
   private sort: GetWinners = {
-    page: 1,
-    limit: 10,
-    sort: 'id',
-    order: 'ASC',
+    page: Arguments.page,
+    limit: Arguments.limit,
+    sort: Sort.id,
+    order: Order.asc,
   };
 
   private cars = new GetData();
@@ -44,8 +67,8 @@ export class Page {
     const carsList = this.cars.getCars();
     for (let i = 0; i < 7; i++) {
       carsList.then((cars: Car[]) => {
-        cars.forEach((item) => {
-          if (item.id === i + 1) {
+        cars.forEach((item, index) => {
+          if (index === i) {
             this.currentCar.push(item);
           }
         });
@@ -105,22 +128,22 @@ export class Page {
     const p = this.el.createElement({ tag: 'p', id: 'page', content: `Page #${this.sort.page}` });
     winnersBlock.append(h2, p);
     const sortMenu = this.el.createElement({ tag: 'div', id: 'sort__list' });
-    const btId = this.el.createElement({ tag: 'button', id: 'button__id', content: 'Id' });
+    const btId = this.el.createElement({ tag: 'button', id: 'button__id', content: TopDown.id });
     const btName = this.el.createElement({ tag: 'button', id: 'button__name', content: 'Name', disable: true });
     const btCar = this.el.createElement({ tag: 'button', id: 'button__car', content: 'Car', disable: true });
-    const btWins = this.el.createElement({ tag: 'button', id: 'button__wins', content: 'Wins' });
-    const btTime = this.el.createElement({ tag: 'button', id: 'button__time', content: 'Time' });
+    const btWins = this.el.createElement({ tag: 'button', id: 'button__wins', content: TopDown.wins });
+    const btTime = this.el.createElement({ tag: 'button', id: 'button__time', content: TopDown.time });
 
     sortMenu.append(btId, btName, btCar, btWins, btTime);
     switch (this.sort.sort) {
-      case 'id': 
-        btId.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+      case Sort.id: 
+        btId.textContent += this.sort.order === Order.asc ? TopDown.top : TopDown.donw;
         break;
-      case 'wins':
-        btWins.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+      case Sort.wins:
+        btWins.textContent += this.sort.order === Order.asc ? TopDown.top : TopDown.donw;
         break;
-      case 'time':
-        btTime.textContent += this.sort.order === 'ASC' ? TopDown.top : TopDown.donw;
+      case Sort.time:
+        btTime.textContent += this.sort.order === Order.asc ? TopDown.top : TopDown.donw;
         break;
       default:
         break;
@@ -136,11 +159,11 @@ export class Page {
     winnersBlock.append(previousNext);
 
     btId.addEventListener('click', () => {
-      this.sort.sort = 'id';
-      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
-      btId.textContent = this.sort.order === 'ASC' ? TopDown.idTop : TopDown.idDown;
-      btWins.textContent = 'Wins';
-      btWins.textContent = 'Time';
+      this.sort.sort = Sort.id;
+      this.sort.order = this.sort.order === Order.asc ? this.sort.order = Order.desc : this.sort.order = Order.asc;
+      btId.textContent = this.sort.order === Order.asc ? TopDown.idTop : TopDown.idDown;
+      btWins.textContent = TopDown.wins;
+      btWins.textContent = TopDown.time;
       this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
         const winnersList = document.getElementById('winners__list');
         if (winnersList) {
@@ -154,11 +177,11 @@ export class Page {
     });
 
     btWins.addEventListener('click', () => {
-      this.sort.sort = 'wins';
-      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
-      btWins.textContent = this.sort.order === 'ASC' ? TopDown.winsTop : TopDown.winsDown;
-      btId.textContent = 'Id';
-      btTime.textContent = 'Time';
+      this.sort.sort = Sort.wins;
+      this.sort.order = this.sort.order === Order.asc ? this.sort.order = Order.desc : this.sort.order = Order.asc;
+      btWins.textContent = this.sort.order === Order.asc ? TopDown.winsTop : TopDown.winsDown;
+      btId.textContent = TopDown.id;
+      btTime.textContent = TopDown.time;
       this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
         const winnersList = document.getElementById('winners__list');
         if (winnersList) {
@@ -172,11 +195,11 @@ export class Page {
     });
 
     btTime.addEventListener('click', () => {
-      this.sort.sort = 'time';
-      this.sort.order = this.sort.order === 'ASC' ? this.sort.order = 'DESC' : this.sort.order = 'ASC';
-      btTime.textContent = this.sort.order === 'ASC' ? TopDown.timeTop : TopDown.timeDown;
-      btId.textContent = 'Id';
-      btWins.textContent = 'Wins';
+      this.sort.sort = Sort.time;
+      this.sort.order = this.sort.order === Order.asc ? this.sort.order = Order.desc : this.sort.order = Order.asc;
+      btTime.textContent = this.sort.order === Order.asc ? TopDown.timeTop : TopDown.timeDown;
+      btId.textContent = TopDown.id;
+      btWins.textContent = TopDown.wins;
       this.cars.getWinners({ page: this.sort.page, limit: this.sort.limit, sort: this.sort.sort, order: this.sort.order }).then((winnersF: Winners[]) => {
         const winnersList = document.getElementById('winners__list');
         if (winnersList) {
@@ -321,7 +344,7 @@ export class Page {
       this.numberWins = [];
       (buttonReset as HTMLButtonElement).disabled = false;
       this.currentCar.forEach((it) => {
-        const bt = document.getElementById(`button__start__${it.id - 1}`);
+        const bt = document.getElementById(`button__start__${it.id}`);
         if (bt) {
           bt.dispatchEvent(new Event('click'));
           (bt as HTMLButtonElement).disabled = true;
@@ -332,8 +355,8 @@ export class Page {
     buttonReset.addEventListener('click', async () => {
       (buttonRace as HTMLButtonElement).disabled = false;
       (buttonReset as HTMLButtonElement).disabled = true;
-      this.currentCar.forEach((it) => {
-        const bt = document.getElementById(`button__stop__${it.id - 1}`);
+      this.currentCar.forEach((it, index) => {
+        const bt = document.getElementById(`button__stop__${it.id}`);
         if (bt) {
           bt.dispatchEvent(new Event('click'));
           (bt as HTMLButtonElement).disabled = true;
@@ -347,7 +370,7 @@ export class Page {
     const contentImage = this.el.createElement({ tag: 'div' });
     const link = this.el.createElement({ tag: 'a' });
     const img = new Image();
-    img.src = './assets/images/logo_rs_text.svg';
+    img.src = SrcImages.logo;
     const linkGit = this.el.createElement({ tag: 'a', classNote: 'footer__git', content: 'balaxon 2023' });
     (linkGit as HTMLAnchorElement).href = 'https://github.com/balaxon';
     link.append(img);
@@ -371,7 +394,6 @@ export class Page {
     const p = this.el.createElement({ tag: 'p', id: 'page', content: `Page #${page}` });
     const div = this.el.createElement({ tag: 'div', id: 'card__list' });
     main.append(h2, p, div);
-
     let counter = 0;
     car.forEach((item, index) => {
       const carCard = this.el.createElement({ tag: 'div', id: 'car__card' });
@@ -381,16 +403,17 @@ export class Page {
       const span = this.el.createElement({ tag: 'span', content: `${item.name}` });
       const track = this.el.createElement({ tag: 'div', classNote: 'track' });
       const buttonDiv = this.el.createElement({ tag: 'div', id: 'start__stop' });
+      //console.log(item.id)
       const btA = this.el.createElement({
         tag: 'button',
         classNote: 'button__start',
-        id: `button__start__${index}`,
+        id: `button__start__${item.id}`,
         content: 'A',
       });
       const btB = this.el.createElement({
         tag: 'button',
         classNote: 'button__stop',
-        id: `button__stop__${index}`,
+        id: `button__stop__${item.id}`,
         content: 'B',
         disable: true,
       });
@@ -400,7 +423,7 @@ export class Page {
       svg.setAttribute('fill', `${item.color}`);
       const image = new Image();
       image.classList.add('finish');
-      image.src = 'assets/images/finish.png';
+      image.src = SrcImages.finish;
       firstDiv.append(btSelect, btRemove, span);
       track.append(buttonDiv, svg, image);
       carCard.append(firstDiv, track);
@@ -540,8 +563,8 @@ export class Page {
             (track.childNodes[i] as HTMLElement).style.display = 'block';
             this.currentCar = [];
             carsList.then((cars: Car[]) => {
-              cars.forEach((item) => {
-                if (item.id === i + 1) {
+              cars.forEach((item, index) => {
+                if (index === i) {
                   this.currentCar.push(item);
                 }
               });
@@ -577,8 +600,8 @@ export class Page {
             (track.childNodes[i] as HTMLElement).style.display = 'block';
             this.currentCar = [];
             carsList.then((cars: Car[]) => {
-              cars.forEach((item) => {
-                if (item.id === i + 1) {
+              cars.forEach((item, index) => {
+                if (index === i) {
                   this.currentCar.push(item);
                 }
               });

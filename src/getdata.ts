@@ -11,6 +11,19 @@ enum Method {
   post = 'POST',
   put = 'PUT',
   get = 'GET',
+  delete = 'DELETE',
+  patch = 'PATCH',
+}
+
+enum Arguments {
+  limit = 10,
+}
+
+enum Status {
+  ok = 200,
+  start = 'started',
+  stop = 'stopped',
+  drive = 'drive',
 }
 
 export class GetData {
@@ -36,7 +49,7 @@ export class GetData {
   }
 
   async deleteCar(id: number) {
-    (await fetch(`${Links.garage}/${id}`, { method: 'DELETE' })).json();
+    (await fetch(`${Links.garage}/${id}`, { method: Method.delete })).json();
   }
 
   async updateCar(id: number, body: SmallCar) {
@@ -52,21 +65,21 @@ export class GetData {
   }
 
   async startEngine(id: number) {
-    return (await fetch(`${Links.engine}?id=${id}&status=started`, { method: 'PATCH' })).json();
+    return (await fetch(`${Links.engine}?id=${id}&status=${Status.start}`, { method: Method.patch })).json();
   }
 
   async stopEngine(id: number) {
-    return (await fetch(`${Links.engine}?id=${id}&status=stopped`, { method: 'PATCH' })).json();
+    return (await fetch(`${Links.engine}?id=${id}&status=${Status.stop}`, { method: Method.patch })).json();
   }
 
   async drive(id: number, signal: AbortSignal) {
-    const res = await fetch(`${Links.engine}?id=${id}&status=drive`, { method: 'PATCH', signal }).catch();
-    return res.status !== 200 ? { success: false } : { success: true };
+    const res = await fetch(`${Links.engine}?id=${id}&status=${Status.drive}`, { method: Method.patch, signal }).catch();
+    return res.status !== Status.ok ? { success: false } : { success: true };
   }
 
   async stopDrive(id: number) {
-    const res = await fetch(`${Links.engine}?id=${id}&status=stopped`, { method: 'PATCH' }).catch();
-    return res.status !== 200 ? { success: false } : { ...(await res.json()) };
+    const res = await fetch(`${Links.engine}?id=${id}&status=${Status.stop}`, { method: Method.patch }).catch();
+    return res.status !== Status.ok ? { success: false } : { ...(await res.json()) };
   }
 
   getSortOrder(sort?: string, order?: string) {
@@ -79,7 +92,7 @@ export class GetData {
     return res;
   }
 
-  async getWinners({ page, limit = 10, sort, order }: GetWinners) {
+  async getWinners({ page, limit = Arguments.limit, sort, order }: GetWinners) {
     return (await fetch(`${Links.winners}?_page=${page}&_limit=${limit}${this.getSortOrder(sort, order)}`)).json();
   }
 
@@ -91,10 +104,8 @@ export class GetData {
     return (await fetch(`${Links.winners}/${id}`)).json();
   }
 
-  getWinnerStatus() {}
-
   async deleteWinner(id: number) {
-    (await fetch(`${Links.winners}/${id}`, { method: 'DELETE' })).json();
+    (await fetch(`${Links.winners}/${id}`, { method: Method.delete })).json();
   }
 
   async createWinner(body: Winners) {
@@ -121,5 +132,4 @@ export class GetData {
     ).json();
   }
 
-  saveWinner() {}
 }

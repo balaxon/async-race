@@ -10,7 +10,6 @@ const devServer = (isDev) => !isDev ? {} : {
     open: true,
     port: 8080,
     hot: true,
-    // contentBase: path.join(__dirname, 'src/assets'),
   },
 };
 
